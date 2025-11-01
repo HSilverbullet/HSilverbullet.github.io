@@ -43,8 +43,18 @@
 <meta property="og:image" content="http://hsilverbullet.github.io/img/QianJianTec1761928721457.jpg">
 <meta property="og:image" content="http://hsilverbullet.github.io/img/%E5%AD%A6%E4%B9%A0%E7%8E%87%E5%A4%A7%E5%B0%8F%E7%9A%84%E5%BD%B1%E5%93%8D.png">
 <meta property="og:image" content="http://hsilverbullet.github.io/img/QianJianTec1761930267754.jpg">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/sigmoid%E5%87%BD%E6%95%B0.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/sigmoid%E5%9B%BE%E5%83%8F.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/QianJianTec1761973408418.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E4%BE%8B%E5%AD%90.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E9%9D%9E%E5%87%B8%E5%87%BD%E6%95%B0.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E4%BC%BC%E7%84%B6%E5%87%BD%E6%95%B0.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/Snipaste_2025-11-01_16-25-15.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/Snipaste_2025-11-01_16-32-57.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/Snipaste_2025-11-01_16-51-12.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/Snipaste_2025-11-01_16-57-40.png">
 <meta property="article:published_time" content="2025-10-05T17:28:08.622Z">
-<meta property="article:modified_time" content="2025-10-31T17:18:50.413Z">
+<meta property="article:modified_time" content="2025-11-01T09:08:33.584Z">
 <meta property="article:author" content="HSilverbullet">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://hsilverbullet.github.io/img/%E8%BF%87%E6%8B%9F%E5%90%88.png">
@@ -252,7 +262,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          4k words
+          5.1k words
         
       </span>
     
@@ -263,7 +273,7 @@
         
         
         
-          34 mins
+          43 mins
         
       </span>
     
@@ -395,37 +405,81 @@
 <p>（<strong>注意：</strong>这里的1/2不会带来本质差别，其存在的意义是之后对损失函数求导后可令系数为1，在形式上简单一些） 上述为度量一个样本，为度量模型在整个数据集上的质量，我们需要计算训练集在n个样本上的损失均值，即均方误差MSE为： <img src="/img/损失均值.png" srcset="/img/loading.gif" lazyload alt="损失函数" /> 有了度量指标，那么我们的目标就是找到w和b使得训练集上的总损失最小： <img src="/img/损失最小化.png" srcset="/img/loading.gif" lazyload alt="损失最小化" /></p>
 接下来为实现损失最小化，首先，我们将偏置b合并到参数w中，令<span class="math inline"><em>b</em> = <em>w</em><sub><em>d</em> + 1</sub></span>,合并方法是在包含所有参数的矩阵中附加一列，如图所示。 首先为参数的初始状态： <!-- ![初始](/img/QianJianTec1761919161520.jpg) -->
 <center>
-<img src="/img/QianJianTec1761919161520.jpg" srcset="/img/loading.gif" lazyload width="50%" height="50%" />
+<img src="/img/QianJianTec1761919161520.jpg" srcset="/img/loading.gif" lazyload width="75%" height="75%" />
 </center>
 我们将b合并到w中： <!-- ![合并偏置项](/img/QianJianTec1761919084433.jpg) -->
 <center>
-<img src="/img/QianJianTec1761919084433.jpg" srcset="/img/loading.gif" lazyload width="50%" height="50%" />
+<img src="/img/QianJianTec1761919084433.jpg" srcset="/img/loading.gif" lazyload width="75%" height="75%" />
 </center>
 我们将所有样本合并起来： <!-- ![合并样本](/img/QianJianTec1761918784006.png) -->
 <center>
-<img src="/img/QianJianTec1761918784006.png" srcset="/img/loading.gif" lazyload width="50%" height="50%" />
+<img src="/img/QianJianTec1761918784006.png" srcset="/img/loading.gif" lazyload width="75%" height="75%" />
 </center>
 令<span class="math inline"><em>X</em> = <em>x</em><sup><em>T</em></sup></span>： <!-- ![](/img/QianJianTec1761918118840.jpg) -->
 <center>
-<img src="/img/QianJianTec1761918118840.jpg" srcset="/img/loading.gif" lazyload width="50%" height="50%" />
+<img src="/img/QianJianTec1761918118840.jpg" srcset="/img/loading.gif" lazyload width="75%" height="75%" />
 </center>
 所以均方误差可转换为下列形式： <!-- ![均方误差](/img/QianJianTec1761922200942.jpg) -->
 <center>
-<img src="/img/QianJianTec1761922200942.jpg" srcset="/img/loading.gif" lazyload width="25%" height="25%" />
+<img src="/img/QianJianTec1761922200942.jpg" srcset="/img/loading.gif" lazyload width="40%" height="40%" />
 </center>
-<p>因此我们的目标就是最小化<span class="math inline">||<em>X</em><em>w</em> − <em>y</em>||<sup>2</sup></span>，我们令MSE关于w的导数为0可以得到解析解，（最小二乘法，这里不再赘述，感兴趣的可以自行了解），但实际情况不是所有问题都有解析解存在，所以我们采用<strong>梯度下降</strong>的方法。</p>
+<p>因此我们的目标就是最小化<span class="math inline">||<em>X</em><em>w</em> − <em>y</em>||<sup>2</sup></span>，我们令MSE关于w的导数为0可以得到解析解，（正规方程，这里不再赘述，感兴趣的可以自行了解），但实际情况不是所有问题都有解析解存在，所以我们采用<strong>梯度下降</strong>的方法。</p>
 <blockquote>
 <p><strong>梯度下降的思想：</strong>开始时随机选择w和b，计算损失函数，然后寻找下一个能让损失函数减少最多的参数组合（当前参数的梯度（即偏导数的向量）的反方向，梯度指明了损失函数最陡峭上升的方向。），持续这么做可以找到一个局部最小值，但这个值不一定为全局最小值，所以采取不同的初始参数组合，可能会得到不同的局部最小值。</p>
 </blockquote>
 随机梯度下降（SGD）：在一次SGD更新中，随机选取一个训练样本<span class="math inline">(<em>x</em><sup>(<em>i</em>)</sup>, <em>y</em><sup>(<em>i</em>)</sup>)</span>用这个样本计算w的梯度并更新。 <!-- ![SGD](/img/QianJianTec1761928721457.jpg) -->
 <center>
-<img src="/img/QianJianTec1761928721457.jpg" srcset="/img/loading.gif" lazyload width="30%" height="30%" />
+<img src="/img/QianJianTec1761928721457.jpg" srcset="/img/loading.gif" lazyload width="40%" height="40%" />
 </center>
-其中，<span class="math inline"><em>α</em></span>为学习率，决定了每次更新的步长。 <img src="/img/学习率大小的影响.png" srcset="/img/loading.gif" lazyload alt="学习率大小的影响" /> 在我们实际应用中，我们会将所有样本都遍历一遍来得到最后的w，这就导致执行速度很慢，因此产生了变体<strong>小批量随机梯度下降</strong>，我们在每次更新时随机抽取一小批样本<span class="math inline">ℬ</span>,它是由固定数量的训练样本组成的。 然后，我们计算小批量的平均损失关于模型参数的导数（也可以称为梯度）。 <!-- ![小批量SGD](/img/QianJianTec1761930267754.jpg) -->
+<p>其中，<span class="math inline"><em>α</em></span>为学习率，决定了每次更新的步长。 <img src="/img/学习率大小的影响.png" srcset="/img/loading.gif" lazyload alt="学习率大小的影响" /></p>
+在我们实际应用中，我们会将所有样本都遍历一遍来得到最后的w，这就导致执行速度很慢，因此产生了变体<strong>小批量随机梯度下降</strong>，我们在每次更新时随机抽取一小批样本<span class="math inline">ℬ</span>,它是由固定数量的训练样本组成的。 然后，我们计算小批量的平均损失关于模型参数的导数（也可以称为梯度）。 <!-- ![小批量SGD](/img/QianJianTec1761930267754.jpg) -->
 <center>
-<img src="/img/QianJianTec1761930267754.jpg" srcset="/img/loading.gif" lazyload width="35%" height="35%" />
+<img src="/img/QianJianTec1761930267754.jpg" srcset="/img/loading.gif" lazyload width="45%" height="45%" />
 </center>
 <h3 id="逻辑回归">逻辑回归</h3>
+<p>逻辑回归是一种广泛应用于分类问题的统计学习方法，尽管名字中带有“回归”，但它实际上是一种用于<strong>二分类或多分类</strong>问题的算法。 逻辑回归通过使用逻辑函数（也称为 <strong>Sigmoid 函数</strong>）将线性回归的输出映射到 0 和 1 之间，从而预测某个事件发生的概率。 逻辑回归广泛应用于各种分类问题，例如：</p>
+<ul>
+<li>垃圾邮件检测（是/不是）</li>
+<li>肿瘤预测（恶性/良性）</li>
+</ul>
+sigmoid函数是一个S形函数： <!-- ![sigmoid函数](/img/sigmoid函数.png) -->
+<center>
+<img src="/img/sigmoid函数.png" srcset="/img/loading.gif" lazyload 
+width="35%" height="35%" />
+</center>
+<img src="/img/sigmoid图像.png" srcset="/img/loading.gif" lazyload alt="sigmoid图像" /> 在逻辑回归中，其输入形式上等同于线性回归的输出，即: <!-- ![逻辑回归公式](/img/QianJianTec1761973408418.png) -->
+<center>
+<img src="/img/QianJianTec1761973408418.png" srcset="/img/loading.gif" lazyload 
+width="75%" height="75%" />
+</center>
+<p>在逻辑回归中，我们将正类标记为1，反类标记为0。<span class="math inline"><em>h</em><sub><em>w</em></sub>(<em>x</em>)</span>函数的作用就是给定输入变量，计算出输出等于1的可能性，即<span class="math inline"><em>h</em><sub><em>w</em></sub>(<em>x</em>) = <em>P</em>(<em>y</em> = 1|<em>x</em>; <em>w</em>)</span>。</p>
+<ul>
+<li>例如对一个肿瘤的样本，计算得到 h_w(x) = 0.7，也就是该肿瘤有70%的可能是恶性的。</li>
+</ul>
+<p>一般我们会设置阈值为0.5，当<span class="math inline"><em>h</em><sub><em>w</em></sub>(<em>x</em>) ≥ 0.5</span>时，预测y=1；当<span class="math inline"><em>h</em><sub><em>w</em></sub>(<em>x</em>) &lt; 0.5</span>时，预测y=0。</p>
+<ul>
+<li>例如：假设现在有一个模型，参数w是向量[-3 1 1]。则当 -3+x1+x2 <span class="math inline">≥</span> 0 ，即 x1+x2 <span class="math inline">≥</span> 3 时，模型将预测 y=1 。我们可以绘制直线 x1+x2=3 ，这条线便是我们模型的分界线，将预测为1的区域和预测为0的区域分隔开。 如下图： <img src="/img/例子.png" srcset="/img/loading.gif" lazyload /></li>
+</ul>
+<p>同线性回归，为找到合适的w，我们需要定义逻辑回归的损失函数，如果我们沿用线性回归中的均方误差为损失函数，将<span class="math inline"><em>h</em><sub><em>w</em></sub>(<em>x</em>)</span>带入其中，会发现我们得到的损失函数是一个非凸函数，如图所示： <img src="/img/非凸函数.png" srcset="/img/loading.gif" lazyload /> 在这种情况下，损失函数存在许多局部最小值，会影响梯度下降法寻找全局最小值，所以我们不能使用均方误差作为逻辑回归的损失函数，我们重新定义损失函数。</p>
+<p>首先，我要先介绍一下<strong>极大似然估计</strong></p>
+<blockquote>
+<p>极大似然估计是一种在统计学中用于估计概率模型参数的方法。其基本思想是：给定一组数据和一个概率模型，最大似然估计会找到模型参数的值，使得这组数据在该模型下出现的概率（即“似然性”）最大。</p>
+</blockquote>
+<p>已知模型参数<span class="math inline">(<em>θ</em><sub>1</sub>, <em>θ</em><sub>2</sub>, ..., <em>θ</em><sub><em>k</em></sub>)</span>，以及数据集D=<span class="math inline"><em>x</em><sub>1</sub>, <em>x</em><sub>2</sub>, ..., <em>x</em><sub><em>n</em></sub></span>，极大似然估计就是要找到<span class="math inline"><em>θ̂</em></span>使得数据集D出现的概率最大，所以定义似然函数： <img src="/img/似然函数.png" srcset="/img/loading.gif" lazyload alt="似然函数" /></p>
+<p>然后对似然函数求导，令导数为0得到的<span class="math inline"><em>θ̂</em></span>即为所求，为方便计算，我们一般对等式两侧取对数然后再计算。</p>
+在我们的逻辑回归中，存在下列关系： <!-- ![](/img/Snipaste_2025-11-01_16-25-15.png) -->
+<center>
+<img src="/img/Snipaste_2025-11-01_16-25-15.png" srcset="/img/loading.gif" lazyload 
+width="50%" height="50%" />
+</center>
+综合起来可写成： <!-- ![](/img/Snipaste_2025-11-01_16-32-57.png) -->
+<center>
+<img src="/img/Snipaste_2025-11-01_16-32-57.png" srcset="/img/loading.gif" lazyload 
+width="75%" height="75%" />
+</center>
+<p>由极大似然估计的原理可写出单个样本i的对数似然函数： <img src="/img/Snipaste_2025-11-01_16-51-12.png" srcset="/img/loading.gif" lazyload /> 最大化对数似然函数就可以求得最符合数据的模型参数w，而我们的损失函数是要最小化，所以我们在对数似然函数前加个负号就可以作为损失函数，同时我们使用整个数据集，得到逻辑回归的损失函数函数： <img src="/img/Snipaste_2025-11-01_16-57-40.png" srcset="/img/loading.gif" lazyload /></p>
+<p>我们的目标就是最小化J(w)，具体方法也可采用梯度下降，具体推导不再赘述，与线性回归类似。</p>
+<h3 id="决策树">决策树</h3>
 <h2 id="深度学习">深度学习</h2>
 <p>前16小节 + 注意力机制（李沐动手学深度学习）</p>
 <h2 id="推荐系统课程">推荐系统课程</h2>
