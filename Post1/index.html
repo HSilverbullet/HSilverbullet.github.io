@@ -65,8 +65,15 @@
 <meta property="og:image" content="http://hsilverbullet.github.io/img/QianJianTec1762142057963.jpg">
 <meta property="og:image" content="http://hsilverbullet.github.io/img/QianJianTec1762152398080.jpg">
 <meta property="og:image" content="http://hsilverbullet.github.io/img/Snipaste_2025-11-03_18-54-17.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E5%8D%95%E6%A3%B5%E5%86%B3%E7%AD%96%E6%A0%91%E4%B8%8D%E7%A8%B3%E5%AE%9A.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/Snipaste_2025-11-11_17-28-15.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E5%9F%BA%E6%9C%AC%E5%88%86%E7%B1%BB%E5%99%A8.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E5%88%86%E7%B1%BB%E8%AF%AF%E5%B7%AE%E7%8E%87.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E5%BC%B1%E5%88%86%E7%B1%BB%E5%99%A8%E7%9A%84%E7%B3%BB%E6%95%B0.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E8%AE%AD%E7%BB%83%E9%9B%86%E7%9A%84%E6%9D%83%E5%80%BC%E5%88%86%E5%B8%83.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E6%9C%80%E7%BB%88%E5%88%86%E7%B1%BB%E5%99%A8.png">
 <meta property="article:published_time" content="2025-10-05T17:28:08.622Z">
-<meta property="article:modified_time" content="2025-11-03T10:59:37.750Z">
+<meta property="article:modified_time" content="2025-11-14T15:12:48.334Z">
 <meta property="article:author" content="HSilverbullet">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://hsilverbullet.github.io/img/%E8%BF%87%E6%8B%9F%E5%90%88.png">
@@ -274,7 +281,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          7k words
+          8.6k words
         
       </span>
     
@@ -285,7 +292,7 @@
         
         
         
-          59 mins
+          72 mins
         
       </span>
     
@@ -559,6 +566,55 @@ width="50%" height="50%" />
 </ul>
 <p>刚才我们一直在做分类问题。考虑当特征标签是连续的情况，即此时若我们是在做回归问题，该怎么解决？如下图例子所示： <img src="/img/Snipaste_2025-11-03_18-54-17.png" srcset="/img/loading.gif" lazyload alt="树回归" /></p>
 <h3 id="集成学习">集成学习</h3>
+<p>单个决策树有一个显著的缺点：它们对训练数据中的微小变化高度敏感。如图所示，仅仅改变一个训练样本的标签（从猫变成狗），就可能导致学习算法构建出一棵结构完全不同的决策树。为了解决单个决策树不稳定的问题，我们可以使用<strong>树集成</strong>的方法。通过结合多个模型的预测结果，使整体性能优于任何单个模型。这一思想的核心是“众人拾柴火焰高”———多个弱模型结合后可以形成一个强模型。 <img src="/img/单棵决策树不稳定.png" srcset="/img/loading.gif" lazyload alt="单棵决策树的不稳定性" /> <img src="/img/Snipaste_2025-11-11_17-28-15.png" srcset="/img/loading.gif" lazyload alt="集成学习示意图" /></p>
+<p>常见的集成学习分为三大类：Stacking(堆叠)，Boosting(提升)，Bagging(Bootstrap aggregating，袋装)。</p>
+<h4 id="boosting">Boosting</h4>
+<blockquote>
+<p>Boosting的工作机制：先从初始训练集训练出一个基学习器，再根据基学习器的表现对训练样本分布进行调整，使得先前基学习器做错的训练样本在后续受到更多关注，然后基于调整后的样本分布来训练下一个基学习器；如此重复进行，直至基学习器数目达到事先指定的值T，最后将这T个基学习器进行加权结合。</p>
+</blockquote>
+<p>Boosting算法最著名的就是AdaBoost，接下来我们将介绍该算法。</p>
+<blockquote>
+<p>AdaBoost通过顺序训练多个弱分类器来构建一个强分类器。其核心流程是：</p>
+<ol type="1">
+<li>首先为所有训练样本赋予相同的初始权重；</li>
+<li>随后，在每一轮迭代中</li>
+</ol>
+<p>    (a)基于当前的样本权重分布训练一个弱分类器</p>
+<p>    (b)计算该弱分类器的加权错误率</p>
+<p>    (c)进而确定其在最终组合中的权重系数</p>
+<p>    (d)之后，根据本轮分类结果更新样本权重——增加被错误分类样本的权重，降低正确分类样本的权重，从而使后续弱分类器更聚焦于之前未能正确处理的样本</p>
+<p>    重复以上过程直至完成预设轮数的训练</p>
+<ol start="3" type="1">
+<li>最终，将所有弱分类器按其对应权重系数进行加权组合，形成强分类器。</li>
+</ol>
+</blockquote>
+<p>输入：训练数据集<span class="math inline"><em>T</em> = (<em>x</em><sub>1</sub>, <em>y</em><sub>1</sub>), (<em>x</em><sub>2</sub>, <em>y</em><sub>2</sub>), ..., (<em>x</em><sub><em>N</em></sub>, <em>y</em><sub><em>N</em></sub>)</span>，<span class="math inline"><em>x</em><sub><em>i</em></sub></span>为实例，<span class="math inline"><em>y</em><sub><em>i</em></sub> ∈  − 1,  + 1</span>；弱学习算法。 输出：最终分类器G(x)</p>
+<p>(1)初始化训练数据的权值分布<span class="math inline"><em>D</em><sub>1</sub> = (<em>w</em><sub>11</sub>, <em>w</em><sub>12</sub>, ..., <em>w</em><sub>1<em>N</em></sub>)</span>，<span class="math inline"><em>w</em><sub>1<em>i</em></sub> = 1/<em>N</em></span></p>
+<p>(2)循环训练M个弱分类器，对m=1, 2, …, M</p>
+<p>   (a)使用样本权值分布为<span class="math inline"><em>D</em><sub><em>m</em></sub></span>的训练数据集学习，得到基本分类器 <img src="/img/基本分类器.png" srcset="/img/loading.gif" lazyload alt="基本分类器" /></p>
+<p>   (b)计算<span class="math inline"><em>G</em><sub><em>m</em></sub>(<em>x</em>)</span>在训练数据集上的分类误差率 <img src="/img/分类误差率.png" srcset="/img/loading.gif" lazyload alt="分类误差率" /></p>
+<p>   (c)计算<span class="math inline"><em>G</em><sub><em>m</em></sub>(<em>x</em>)</span>的系数，这是关于分类错误率<span class="math inline"><em>e</em><sub><em>m</em></sub></span>的单减函数，所以分类错误率低，即更准确的弱分类器在最终分类器中的权重高，符合直觉。 <img src="/img/弱分类器的系数.png" srcset="/img/loading.gif" lazyload alt="弱分类器的系数" /></p>
+<p>   (d)更新训练集的权值分布，若该样本点被预测正确，那么<span class="math inline"><em>y</em><sub><em>i</em></sub><em>G</em><sub><em>m</em></sub>(<em>x</em>)</span>为1，<span class="math inline"><em>e</em><em>x</em><em>p</em>( − <em>α</em><sub><em>m</em></sub>)</span>小于1，该样本点在下一轮训练时可以弱化，反之，若样本点被预测错误则强化。<span class="math inline"><em>Z</em><sub><em>m</em></sub></span>起归一化的作用。 <img src="/img/训练集的权值分布.png" srcset="/img/loading.gif" lazyload alt="训练集的权值分布" /></p>
+<p>(3)根据步骤2得到的各分类器即其系数进行组合，构建最终分类器。 <img src="/img/最终分类器.png" srcset="/img/loading.gif" lazyload alt="最终分类器" /></p>
+<h4 id="bagging">Bagging</h4>
+<p>随机森林是通过构建多棵决策树并集成其结果的机器学习算法，核心是<strong>Bagging + 特征随机性</strong>。</p>
+<p>输入参数：</p>
+<ul>
+<li>训练集 <span class="math inline"><em>D</em> = {(<em>x</em><sub>1</sub>, <em>y</em><sub>1</sub>), (<em>x</em><sub>2</sub>, <em>y</em><sub>2</sub>), ..., (<em>x</em><sub><em>N</em></sub>, <em>y</em><sub><em>N</em></sub>)}</span></li>
+<li>弱学习器（决策树）数量 <span class="math inline"><em>T</em></span></li>
+<li>特征子集大小 <span class="math inline"><em>m</em></span>（通常为总特征数 <span class="math inline"><em>M</em></span> 的平方根或对数）</li>
+</ul>
+<p>对于每棵树 <span class="math inline"><em>t</em> = 1, 2, ..., <em>T</em></span>：</p>
+<p>(1)Bootstrap行采样</p>
+<p>   从原始训练集D中有放回地随机抽取N个样本，形成自助采样集<span class="math inline"><em>D</em><sub><em>t</em></sub></span>，因为每个样本被抽中的概率为 <span class="math inline">1 − (1 − 1/<em>N</em>)<sup><em>N</em></sup> ≈ 63.2%</span>，所以有约36.8%的样本成为<strong>袋外数据（OOB）</strong>，可用于模型验证</p>
+<p>(2)构建决策树 对于树中的每个节点：</p>
+<blockquote>
+<p>   (a)从全部 <span class="math inline"><em>M</em></span> 个特征中随机选择 <span class="math inline"><em>m</em></span> 个特征（<span class="math inline"><em>m</em> ≪ <em>M</em></span>）</p>
+<p>   (b)在选中的 <span class="math inline"><em>m</em></span> 个特征中寻找最优分裂点，然后使用指标（基尼指数、信息增益等）评估分裂质量，最后选择最佳特征和分裂阈值进行节点分裂</p>
+<p>   (c)递归执行上述过程，直到满足停止条件： - 节点中样本数少于最小分裂样本数 - 节点深度达到最大值 - 节点中样本属于同一类别 - 不纯度减少量小于阈值</p>
+<p>   (d)随机森林中的决策树通常<strong>完全生长</strong>，不进行剪枝</p>
+</blockquote>
+<p>在最终预测时，对于分类问题就使用T个决策树对输入进行独立预测，将结果进行投票，少数服从多数得到最终结果。对于回归问题就将每个决策树的结果进行求平均值作为最终输出。</p>
 <h2 id="深度学习">深度学习</h2>
 <p>前16小节 + 注意力机制（李沐动手学深度学习）</p>
 <h2 id="推荐系统课程">推荐系统课程</h2>
