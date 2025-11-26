@@ -83,8 +83,15 @@
 <meta property="og:image" content="http://hsilverbullet.github.io/img/%E8%BE%93%E5%85%A5%E9%97%A8.png">
 <meta property="og:image" content="http://hsilverbullet.github.io/img/%E6%9B%B4%E6%96%B0%E7%BB%86%E8%83%9E%E7%8A%B6%E6%80%81.png">
 <meta property="og:image" content="http://hsilverbullet.github.io/img/%E8%BE%93%E5%87%BA%E9%97%A8.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6%E8%A7%A3%E9%87%8A.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E6%A0%B9%E5%8F%B7dk.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E5%A4%9A%E5%A4%B4%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E5%A4%9A%E5%A4%B4%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B62.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/transformer.png">
 <meta property="article:published_time" content="2025-10-05T17:28:08.622Z">
-<meta property="article:modified_time" content="2025-11-25T05:16:53.441Z">
+<meta property="article:modified_time" content="2025-11-26T14:11:33.787Z">
 <meta property="article:author" content="HSilverbullet">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://hsilverbullet.github.io/img/%E8%BF%87%E6%8B%9F%E5%90%88.png">
@@ -292,7 +299,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          9.7k words
+          11k words
         
       </span>
     
@@ -303,7 +310,7 @@
         
         
         
-          82 mins
+          93 mins
         
       </span>
     
@@ -651,7 +658,29 @@ width="50%" height="50%" />
 <p>得到需要遗忘和新增的记忆后，我们就可以更新细胞状态。将旧状态与遗忘向量相乘，忘掉我们决定忘记的东西。然后加上新的候选值。 <img src="/img/更新细胞状态.png" srcset="/img/loading.gif" lazyload alt="更新细胞状态" /></p>
 <p>最后我们决定输出什么，这个输出也是新的隐藏层状态<span class="math inline"><em>h</em><sub><em>t</em></sub></span>。首先，我们运行一个sigmoid层，它决定输出细胞状态的哪些部分。然后，我们将细胞状态输入到tanh层（为了将值压在−1​和1之间）并将其乘以sigmoid门的输出，这样我们就只输出我们决定要输出的部分。 <img src="/img/输出门.png" srcset="/img/loading.gif" lazyload alt="输出门" /></p>
 <h3 id="自注意力机制">自注意力机制</h3>
+<p>自注意力（Self-Attention）机制是一种特殊的注意力机制，对于序列中的每一个元素（比如一个词），它会计算序列中所有其他元素对该元素的“重要性”或“相关度”，从而帮助模型更好地理解序列中的上下文信息，更准确地处理序列数据。</p>
+<blockquote>
+<p>比如在处理“这只动物没有穿过街道，因为它太累了。”这个句子时，模型通过计算句子中所有其他词与 “它” 的相关性，可以判断 “动物” 与 “它” 的联系最紧密，所以得到“它”指的是“动物”而不是“街道”。</p>
+</blockquote>
+<p>为了实现上述思想，自注意力机制引入了三个重要的向量：<strong>查询（query）、键（key）和值（value）</strong>。</p>
+<p>接下来具体阐述自注意力机制的过程，下图所示公式即为自注意力机制的核心： <img src="/img/自注意力机制.png" srcset="/img/loading.gif" lazyload alt="自注意力机制" /></p>
+<p>自注意力机制公示的本质可以看作是<span class="math inline"><em>s</em><em>o</em><em>f</em><em>t</em><em>m</em><em>a</em><em>x</em>(<em>X</em><em>X</em><sup><em>T</em></sup>)<em>X</em></span>，下面给出一个具体的例子，来探究该公式的具体意义。</p>
+<p>首先是<span class="math inline"><em>X</em><em>X</em><sup><em>T</em></sup></span>，根据定义，两个向量的点积是两个向量的长度与它们夹角余弦的积。如果两向量夹角为90°，那么结果为0，代表两个向量线性无关。如果两个向量夹角越小，两向量在方向上相关性也越强，结果也越大。点积反映了两个向量在方向上的相关性，结果越大越相关。然后使用一个Softmax函数，对其归一化，可以凸显相关性最大的值并抑制远低于最大值的其他分量。最后使用<span class="math inline"><em>s</em><em>o</em><em>f</em><em>t</em><em>m</em><em>a</em><em>x</em>(<em>X</em><em>X</em><sup><em>T</em></sup>)</span>点乘X，就可以将得到的相关性信息也包含到X向量中。</p>
+<p>注意下图中的数字是我随便编的，只起到一个帮助理解的作用，不对具体意义负责。 <img src="/img/自注意力机制解释.png" srcset="/img/loading.gif" lazyload /></p>
+<p>对自注意力机制的本质了解后，自注意力机制本身的公式也很好理解了，将X与矩阵<span class="math inline"><em>W</em><sub><em>q</em></sub>、<em>W</em><sub><em>k</em></sub>、<em>W</em><sub><em>v</em></sub></span>相乘，得到<span class="math inline"><em>Q</em>、<em>K</em>、<em>V</em></span>向量后执行相同的操作。（矩阵<span class="math inline"><em>W</em><sub><em>q</em></sub>、<em>W</em><sub><em>k</em></sub>、<em>W</em><sub><em>v</em></sub></span>是训练得到的）</p>
+<p>那么问题来了，我们为什么不能直接使用X，而要再引入Q、K、V？自注意力机制为了让每个 token 既能“提问”、又能“被识别”、还要“贡献内容”，必须把输入 X 映射成 3 个角色：Q、K、V。三个线性变换让模型在不同子空间中学习匹配模式和信息提取，极大增强了表达能力。同时线性变换引入了额外的可学习参数<span class="math inline"><em>W</em><sub><em>q</em></sub>、<em>W</em><sub><em>k</em></sub>、<em>W</em><sub><em>v</em></sub></span>。这增加了模型的容量，使其能够拟合更复杂的数据分布和语言现象。</p>
+<blockquote>
+<p>“提问”：这是query的角色。序列中的每个token都通过Q向量发出一个query：在这个上下文中，哪些token的信息对我最重要？</p>
+<p>“被识别”：这是key的角色。每个token都通过K向量提供一个“身份标识”，用于回应其他token的查询，告诉别人“我是谁，我有什么特征”。</p>
+<p>“贡献内容”：这是value的角色。每个token都通过V向量来提供它最终要贡献的“实质信息内容”。这个信息可能需要是经过提炼的，与原始输入不同。</p>
+</blockquote>
+<p>除了上述问题，在注意力机制中还除以了根号<span class="math inline"><em>d</em><sub><em>k</em></sub></span>，是为了防止点积 <span class="math inline"><em>Q</em><em>K</em><sup><em>T</em></sup></span> 随维度增大而数值过大，使 Softmax 的梯度过小，从而导致训练不稳定。本质是对点积进行标准化，使其在 Softmax 中保持适当的数值范围，避免梯度消失，稳定训练。下图给出一个具体的例子： <img src="/img/根号dk.png" srcset="/img/loading.gif" lazyload /></p>
+<p>至此，自注意力机制就解释清楚了，我们最后给出自注意力机制的完整图解。 <img src="/img/自注意力机制流程.png" srcset="/img/loading.gif" lazyload alt="自注意力机制图解" /></p>
+<p>多头注意力机制是将多个自注意力机制组合形成的，在transformer中使用了8个多头注意力机制，所以我们这里也以8个自注意力机制为例。多头注意力机制首先使用8个w矩阵生成Q、K、V，执行8次自注意力机制得到8个Z矩阵，然后将8个Z矩阵拼接起来（Concat），然后乘附加权重矩阵<span class="math inline"><em>W</em><sub><em>o</em></sub></span>得到最终的Z。 <img src="/img/多头注意力机制.png" srcset="/img/loading.gif" lazyload alt="多头注意力机制" /> <img src="/img/多头注意力机制2.png" srcset="/img/loading.gif" lazyload alt="多头注意力机制" /></p>
 <h3 id="transformer">Transformer</h3>
+<figure>
+<img src="/img/transformer.png" srcset="/img/loading.gif" lazyload alt="Transformer" /><figcaption aria-hidden="true">Transformer</figcaption>
+</figure>
 <h2 id="推荐系统课程">推荐系统课程</h2>
 <p>王树森推荐系统课程</p>
 <h2 id="leetcode-hot-100">LeetCode hot 100</h2>
