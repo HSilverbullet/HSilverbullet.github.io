@@ -1,0 +1,702 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="HSilverbullet">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="深度学习 循环神经网络（RNN） 普通前馈神经网络（如CNN）一般处理的是固定长度、互不相关的输入，比如一张图片、一个固定长度的特征向量。但很多任务中，当前时刻的输出跟“之前发生了什么”强相关，例如：机器翻译：当前要翻译的词要看前面一句话的意思；语言模型：预测下一个词要看前面所有词；股票预测：今天的走势与过去几天的价格、成交量有关。因此，为了能够更好的处理序列的信息，RNN产生了。 首先介绍">
+<meta property="og:type" content="article">
+<meta property="og:title" content="搜广推学习之路（二）">
+<meta property="og:url" content="http://hsilverbullet.github.io/Post2/index.html">
+<meta property="og:site_name" content="HSilverbullet&#39;s Blog">
+<meta property="og:description" content="深度学习 循环神经网络（RNN） 普通前馈神经网络（如CNN）一般处理的是固定长度、互不相关的输入，比如一张图片、一个固定长度的特征向量。但很多任务中，当前时刻的输出跟“之前发生了什么”强相关，例如：机器翻译：当前要翻译的词要看前面一句话的意思；语言模型：预测下一个词要看前面所有词；股票预测：今天的走势与过去几天的价格、成交量有关。因此，为了能够更好的处理序列的信息，RNN产生了。 首先介绍">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/RNN%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/RNN%E5%B1%95%E5%BC%80%E5%9B%BE.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/RNN%E8%AE%A1%E7%AE%97%E5%85%AC%E5%BC%8F.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/Snipaste_2025-11-23_22-58-11.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/RNN.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/LSTM.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E9%81%97%E5%BF%98%E9%97%A8.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E8%BE%93%E5%85%A5%E9%97%A8.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E6%9B%B4%E6%96%B0%E7%BB%86%E8%83%9E%E7%8A%B6%E6%80%81.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E8%BE%93%E5%87%BA%E9%97%A8.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6%E8%A7%A3%E9%87%8A.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E6%A0%B9%E5%8F%B7dk.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E5%A4%9A%E5%A4%B4%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E5%A4%9A%E5%A4%B4%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B62.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/transformer.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/trm%E6%80%BB%E4%BD%93%E6%9E%B6%E6%9E%84.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/PE%E4%BE%8B%E5%AD%90.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/Snipaste_2025-11-28_20-21-56.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/encoder.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E6%AE%8B%E5%B7%AE%E8%BF%9E%E6%8E%A5.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/Masked%20Multi-Head%20Attention.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/Cross%20Attention.png">
+<meta property="article:published_time" content="2025-11-28T14:50:30.107Z">
+<meta property="article:modified_time" content="2025-11-28T14:51:27.213Z">
+<meta property="article:author" content="HSilverbullet">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://hsilverbullet.github.io/img/RNN%E7%BB%93%E6%9E%84.png">
+  
+  
+  
+  <title>搜广推学习之路（二） - HSilverbullet&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"hsilverbullet.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>NF</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archives</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>Links</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/post1.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="搜广推学习之路（二）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-11-28 22:50" pubdate>
+          November 28, 2025
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.2k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          36 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">搜广推学习之路（二）</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="深度学习">深度学习</h2>
+<h3 id="循环神经网络rnn">循环神经网络（RNN）</h3>
+<p>普通前馈神经网络（如CNN）一般处理的是固定长度、互不相关的输入，比如一张图片、一个固定长度的特征向量。但很多任务中，当前时刻的输出跟“之前发生了什么”强相关，例如：机器翻译：当前要翻译的词要看前面一句话的意思；语言模型：预测下一个词要看前面所有词；股票预测：今天的走势与过去几天的价格、成交量有关。因此，为了能够更好的处理序列的信息，RNN产生了。</p>
+<p>首先介绍一下RNN的基础结构，如下图所示： <img src="/img/RNN结构.png" srcset="/img/loading.gif" lazyload alt="RNN结构" /></p>
+<p>在解析这张图之前，我们先将W即其所在圆圈忽略，那么就是一个全连接神经网络的简略图，展开即下图所示： <img src="/img/神经网络.png" srcset="/img/loading.gif" lazyload alt="对应的全连接神经网络" /></p>
+<p>X是神经网络的输入向量，U是输入层到隐藏层的参数矩阵，S是隐藏层的输出向量，V是隐藏层到输出层的参数矩阵，O是输出层的向量，即为神经网络的输出向量。</p>
+<p>那么RNN中的W是什么？这个W参数就是RNN实现“记忆”的关键。我们将RNN结构图展开如下图所示： <img src="/img/RNN展开图.png" srcset="/img/loading.gif" lazyload alt="RNN展开图" /></p>
+<ul>
+<li><span class="math inline"><em>x</em><sub><em>t</em></sub></span>表示网络每一时刻的输入</li>
+<li><span class="math inline"><em>o</em><sub><em>t</em></sub></span>表示网络每一时刻的输出</li>
+<li><span class="math inline"><em>s</em><sub><em>t</em></sub></span>表示网络的隐藏层的状态输出</li>
+<li>U、V、W是RNN在所有时刻的共享参数</li>
+</ul>
+<p>根据该展开图，我们可以得到RNN的计算公式： <img src="/img/RNN计算公式.png" srcset="/img/loading.gif" lazyload alt="RNN计算公式" /></p>
+<p>其中<span class="math inline"><em>g</em>( ⋅ )</span>和<span class="math inline"><em>f</em>( ⋅ )</span>函数均为激活函数。我们若将状态<span class="math inline"><em>s</em><sub><em>t</em></sub></span>不断使用公式进行展开就可以得到： <img src="/img/Snipaste_2025-11-23_22-58-11.png" srcset="/img/loading.gif" lazyload /></p>
+<p>从上面可以看出，循环神经网络的输出值，是受前面历次输入值<span class="math inline"><em>x</em><sub><em>t</em></sub>、<em>x</em><sub><em>t</em> − 1</sub>、<em>x</em><sub><em>t</em> − 3</sub>、...</span>影响的，这就是为什么循环神经网络可以“记忆历史”。</p>
+<p>为了方便与LSTM进行对比，在这里给出RNN的一个新的结构图，这里的<span class="math inline"><em>h</em><sub><em>t</em></sub></span>即为我们上述提到的<span class="math inline"><em>s</em><sub><em>t</em></sub></span>，隐藏层状态。 <img src="/img/RNN.png" srcset="/img/loading.gif" lazyload alt="RNN" /></p>
+<h3 id="lstm">LSTM</h3>
+<p>对于普通RNN来说，当序列很长时，RNN很难将早期步骤的信息传递到后期步骤。比如，在句子“这只猫因为吃了太多的奶酪，所以现在……很饱”中，RNN可能早就忘记了主语是“猫”，导致后面预测错误。它更擅长记忆“短期”信息，而遗忘“长期”信息。而针对该问题，LSTM被提出。</p>
+<p>LSTM主要由<strong>细胞状态</strong>和<strong>门控机制</strong>组成，而门控机制又由<strong>遗忘门、输入门和输出门</strong>组成。 <img src="/img/LSTM.png" srcset="/img/loading.gif" lazyload alt="LSTM" /></p>
+<p>LSTM首先会决定从细胞状态中丢弃哪些信息。通过<span class="math inline"><em>x</em></span>和<span class="math inline"><em>h</em><sub><em>t</em></sub></span>的操作，并经过sigmoid函数，得到0,1的向量，0代表清除记忆，1代表保留记忆. <img src="/img/遗忘门.png" srcset="/img/loading.gif" lazyload alt="遗忘门" /></p>
+<p>下一步决定将哪些新信息存储在细胞状态中。这分为两部分，首先，一个sigmoid层决定要更新哪些值。接下来，tanh层创建一个新的候选值向量，代表可能会加入到状态中的新内容。将把这两者结合起来，以更新状态。 <img src="/img/输入门.png" srcset="/img/loading.gif" lazyload alt="输入门" /></p>
+<p>得到需要遗忘和新增的记忆后，我们就可以更新细胞状态。将旧状态与遗忘向量相乘，忘掉我们决定忘记的东西。然后加上新的候选值。 <img src="/img/更新细胞状态.png" srcset="/img/loading.gif" lazyload alt="更新细胞状态" /></p>
+<p>最后我们决定输出什么，这个输出也是新的隐藏层状态<span class="math inline"><em>h</em><sub><em>t</em></sub></span>。首先，我们运行一个sigmoid层，它决定输出细胞状态的哪些部分。然后，我们将细胞状态输入到tanh层（为了将值压在−1​和1之间）并将其乘以sigmoid门的输出，这样我们就只输出我们决定要输出的部分。 <img src="/img/输出门.png" srcset="/img/loading.gif" lazyload alt="输出门" /></p>
+<h3 id="自注意力机制">自注意力机制</h3>
+<p>自注意力（Self-Attention）机制是一种特殊的注意力机制，对于序列中的每一个元素（比如一个词），它会计算序列中所有其他元素对该元素的“重要性”或“相关度”，从而帮助模型更好地理解序列中的上下文信息，更准确地处理序列数据。</p>
+<blockquote>
+<p>比如在处理“这只动物没有穿过街道，因为它太累了。”这个句子时，模型通过计算句子中所有其他词与 “它” 的相关性，可以判断 “动物” 与 “它” 的联系最紧密，所以得到“它”指的是“动物”而不是“街道”。</p>
+</blockquote>
+<p>为了实现上述思想，自注意力机制引入了三个重要的向量：<strong>查询（query）、键（key）和值（value）</strong>。</p>
+<p>接下来具体阐述自注意力机制的过程，下图所示公式即为自注意力机制的核心： <img src="/img/自注意力机制.png" srcset="/img/loading.gif" lazyload alt="自注意力机制" /></p>
+<p>自注意力机制公示的本质可以看作是<span class="math inline"><em>s</em><em>o</em><em>f</em><em>t</em><em>m</em><em>a</em><em>x</em>(<em>X</em><em>X</em><sup><em>T</em></sup>)<em>X</em></span>，下面给出一个具体的例子，来探究该公式的具体意义。</p>
+<p>首先是<span class="math inline"><em>X</em><em>X</em><sup><em>T</em></sup></span>，根据定义，两个向量的点积是两个向量的长度与它们夹角余弦的积。如果两向量夹角为90°，那么结果为0，代表两个向量线性无关。如果两个向量夹角越小，两向量在方向上相关性也越强，结果也越大。点积反映了两个向量在方向上的相关性，结果越大越相关。然后使用一个Softmax函数，对其归一化，可以凸显相关性最大的值并抑制远低于最大值的其他分量。最后使用<span class="math inline"><em>s</em><em>o</em><em>f</em><em>t</em><em>m</em><em>a</em><em>x</em>(<em>X</em><em>X</em><sup><em>T</em></sup>)</span>点乘X，就可以将得到的相关性信息也包含到X向量中。</p>
+<p>注意下图中的数字是我随便编的，只起到一个帮助理解的作用，不对具体意义负责。 <img src="/img/自注意力机制解释.png" srcset="/img/loading.gif" lazyload /></p>
+<p>对自注意力机制的本质了解后，自注意力机制本身的公式也很好理解了，将X与矩阵<span class="math inline"><em>W</em><sub><em>q</em></sub>、<em>W</em><sub><em>k</em></sub>、<em>W</em><sub><em>v</em></sub></span>相乘，得到<span class="math inline"><em>Q</em>、<em>K</em>、<em>V</em></span>向量后执行相同的操作。（矩阵<span class="math inline"><em>W</em><sub><em>q</em></sub>、<em>W</em><sub><em>k</em></sub>、<em>W</em><sub><em>v</em></sub></span>是训练得到的）</p>
+<p>那么问题来了，我们为什么不能直接使用X，而要再引入Q、K、V？自注意力机制为了让每个 token 既能“提问”、又能“被识别”、还要“贡献内容”，必须把输入 X 映射成 3 个角色：Q、K、V。三个线性变换让模型在不同子空间中学习匹配模式和信息提取，极大增强了表达能力。同时线性变换引入了额外的可学习参数<span class="math inline"><em>W</em><sub><em>q</em></sub>、<em>W</em><sub><em>k</em></sub>、<em>W</em><sub><em>v</em></sub></span>。这增加了模型的容量，使其能够拟合更复杂的数据分布和语言现象。</p>
+<blockquote>
+<p>“提问”：这是query的角色。序列中的每个token都通过Q向量发出一个query：在这个上下文中，哪些token的信息对我最重要？</p>
+<p>“被识别”：这是key的角色。每个token都通过K向量提供一个“身份标识”，用于回应其他token的查询，告诉别人“我是谁，我有什么特征”。</p>
+<p>“贡献内容”：这是value的角色。每个token都通过V向量来提供它最终要贡献的“实质信息内容”。这个信息可能需要是经过提炼的，与原始输入不同。</p>
+</blockquote>
+<p>除了上述问题，在注意力机制中还除以了根号<span class="math inline"><em>d</em><sub><em>k</em></sub></span>，是为了防止点积 <span class="math inline"><em>Q</em><em>K</em><sup><em>T</em></sup></span> 随维度增大而数值过大，使 Softmax 的梯度过小，从而导致训练不稳定。本质是对点积进行标准化，使其在 Softmax 中保持适当的数值范围，避免梯度消失，稳定训练。下图给出一个具体的例子： <img src="/img/根号dk.png" srcset="/img/loading.gif" lazyload /></p>
+<p>至此，自注意力机制就解释清楚了，我们最后给出自注意力机制的完整图解。 <img src="/img/自注意力机制流程.png" srcset="/img/loading.gif" lazyload alt="自注意力机制图解" /></p>
+<p>多头注意力机制是将多个自注意力机制组合形成的，在transformer中使用了8个多头注意力机制，所以我们这里也以8个自注意力机制为例。多头注意力机制首先使用8个w矩阵生成Q、K、V，执行8次自注意力机制得到8个Z矩阵，然后将8个Z矩阵拼接起来（Concat），然后乘附加权重矩阵<span class="math inline"><em>W</em><sub><em>o</em></sub></span>得到最终的Z。 <img src="/img/多头注意力机制.png" srcset="/img/loading.gif" lazyload alt="多头注意力机制" /> <img src="/img/多头注意力机制2.png" srcset="/img/loading.gif" lazyload alt="多头注意力机制" /></p>
+<h3 id="transformer">Transformer</h3>
+<figure>
+<img src="/img/transformer.png" srcset="/img/loading.gif" lazyload alt="Transformer" /><figcaption aria-hidden="true">Transformer</figcaption>
+</figure>
+<p>transformer的结构可分为encoder和decoder两大部分，其中encoder部分有6个encoder块，decoder部分也有6个decoder块。encoder部分最后一个encoder块的信息会传递给每一个decoder块使用。 <img src="/img/trm总体架构.png" srcset="/img/loading.gif" lazyload alt="Transformer" /></p>
+<p>在介绍具体架构前，我们先介绍输入部分，由于transformer是并行处理数据的，所以transformer并不像RNN一样，可以包含时间顺序，为了解决这一问题，transformer在输入部分添加了位置编码 Positional Encoding。下图为位置编码公式： <img src="/img/位置编码.png" srcset="/img/loading.gif" lazyload alt="位置编码" /></p>
+<p>为了理解上述表达式，我们以<span class="math inline"><em>d</em><sub><em>m</em><em>o</em><em>d</em><em>e</em><em>l</em></sub> = 4</span>的短语“I am a robot”为例，展示该短语的位置编码矩阵，为了方便计算，我们使用100代替公式中的10000。需要说明的是i的计算，短语维度为4，2i表示偶数维度，2i+1表示奇数维度，所以对于四个维度0、1、2、3，对应的i为0、0、1、1。 <img src="/img/PE例子.png" srcset="/img/loading.gif" lazyload alt="PE例子" /></p>
+<p>有了位置编码后，我们将输入向量x与其对应的位置编码相加就可以得到transformer的输入。 <img src="/img/Snipaste_2025-11-28_20-21-56.png" srcset="/img/loading.gif" lazyload /></p>
+<p>然后我们介绍encoder部分，该部分由 Multi-Head Attention, Add &amp; Normalize, Feed Forward, Add &amp; Normalize 组成的。 <img src="/img/encoder.png" srcset="/img/loading.gif" lazyload alt="encoder" /></p>
+<p>Add &amp; Normalize层包括Add和Normalize两部分，这里的Add是残差连接，即y = x + F(x)。在encoder中即为X + SelfAttention(X)和X + FeedForward(X)。 <img src="/img/残差连接.png" srcset="/img/loading.gif" lazyload alt="残差连接" /></p>
+<p>残差连接之后，将结果normalize，normalize 指 Layer Normalization，通常用于 RNN 结构，Layer Normalization 会将每一层神经元的输入都转成均值方差都一样的，这样可以加快收敛。</p>
+<p>Feed Forward就是一个两层的神经网络，先线性变换，然后ReLU非线性，再线性变换。</p>
+<p>encoder部分就结束了，接下来我们介绍decoder部分。 首先是decoder部分的输入，在训练阶段，我们采用teacher forcing策略，假设我们的训练数据为“I love you”，而经翻译得到的目标序列为“我爱你”，那么我们将目标序列加上特殊符号，<span class="math inline"> &lt; <em>B</em><em>e</em><em>g</em><em>i</em><em>n</em>&gt;</span>表示序列开始，<span class="math inline"> &lt; <em>e</em><em>n</em><em>d</em>&gt;</span>表示序列结束，这样完整的目标序列就为“<span class="math inline"> &lt; <em>B</em><em>e</em><em>g</em><em>i</em><em>n</em>&gt;</span>我爱你<span class="math inline"> &lt; <em>e</em><em>n</em><em>d</em>&gt;</span>”，而decoder的输入需要将完整的目标序列右移一位，并去掉结尾的<span class="math inline"> &lt; <em>e</em><em>n</em><em>d</em>&gt;</span>，所以decoder的输入就为“<span class="math inline"> &lt; <em>B</em><em>e</em><em>g</em><em>i</em><em>n</em>&gt;</span>我爱你”。</p>
+<p>decoder部分与encoder部分不同的有两个地方，decoder部分包含有两个 Multi-Head Attention 层，其中第一个 Multi-Head Attention 层采用了 Masked 操作；第二个 Multi-Head Attention 层的K,V矩阵使用 Encoder 的编码信息矩阵（最终输出）进行计算，而Q使用 Decoder 第一个自注意力输出计算，所以第二个注意力机制也被叫做Cross-Attention 交叉注意力。</p>
+<p>接下来我们具体介绍 Masked Multi-Head Attention层。如果没有 Mask，在训练时，Decoder 在计算第一个词 <span class="math inline"> &lt; <em>B</em><em>e</em><em>g</em><em>i</em><em>n</em>&gt;</span> 的表示时，就能“看到”整个答案序列（如“我爱你”）。这被称为信息泄露。模型会学会简单地复制输入中的下一个词，而不是真正学习如何基于上文进行预测。所以为了确保生成目标，我们在注意力机制中引入一个掩码（Mask），来屏蔽掉未来的信息。下图为具体的过程，之后的softmax、与V相乘等过程与一般的多头注意力机制一致，所以没有给出。 <img src="/img/Masked%20Multi-Head%20Attention.png" srcset="/img/loading.gif" lazyload alt="Masked Multi-Head Attention" /></p>
+<p>而交叉注意力机制很简单，只要将encoder最后一层的K和V矩阵用于每一层的decoder即可，其余部分与一般的多头注意力机制没有区别。 <img src="/img/Cross%20Attention.png" srcset="/img/loading.gif" lazyload /></p>
+<p>至此，transformer就介绍完了。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>搜广推学习之路（二）</div>
+      <div>http://hsilverbullet.github.io/Post2/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>HSilverbullet</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>November 28, 2025</div>
+        </div>
+      
+      
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/Post3/" title="搜广推学习之路（三）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">搜广推学习之路（三）</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/Post1/" title="搜广推学习之路（一）">
+                        <span class="hidden-mobile">搜广推学习之路（一）</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Table of Contents</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a target="_blank" rel="nofollow noopener"><span>HSilverbullet</span></a> <i class="iconfont icon-love"></i> <a target="_blank" rel="nofollow noopener"><span>Technology</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>
