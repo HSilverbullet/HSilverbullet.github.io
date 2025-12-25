@@ -79,8 +79,11 @@
 <meta property="og:image" content="http://hsilverbullet.github.io/img/%E8%87%AA%E7%9B%91%E7%9D%A3%E5%AD%A6%E4%B9%A02.png">
 <meta property="og:image" content="http://hsilverbullet.github.io/img/%E8%87%AA%E7%9B%91%E7%9D%A3%E5%AD%A6%E4%B9%A03.png">
 <meta property="og:image" content="http://hsilverbullet.github.io/img/%E5%8F%8C%E5%A1%94%E6%A8%A1%E5%9E%8B+%E8%87%AA%E7%9B%91%E7%9D%A3%E5%AD%A6%E4%B9%A0.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/Bloom%20Filter.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/Bloom%20Filter.png">
+<meta property="og:image" content="http://hsilverbullet.github.io/img/%E6%9B%9D%E5%85%89%E8%BF%87%E6%BB%A4.png">
 <meta property="article:published_time" content="2025-11-28T14:51:45.035Z">
-<meta property="article:modified_time" content="2025-12-22T15:07:29.632Z">
+<meta property="article:modified_time" content="2025-12-25T12:03:49.894Z">
 <meta property="article:author" content="HSilverbullet">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://hsilverbullet.github.io/img/%E8%BD%AC%E5%8C%96%E6%B5%81%E7%A8%8B.png">
@@ -288,7 +291,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          10k words
+          11k words
         
       </span>
     
@@ -299,7 +302,7 @@
         
         
         
-          84 mins
+          91 mins
         
       </span>
     
@@ -572,6 +575,16 @@
 <h4 id="曝光过滤-bloom-filter">曝光过滤 &amp; Bloom Filter</h4>
 <p>曝光过滤是指如果用户看过某个物品的话，我们就不再将该物品曝光给该用户。所以我们记录曝光给每个用户的物品（只需要记录一个月以内的，因为小红书只召回一个月内发布的笔记），对于每个召回的物品，判断它是否已经曝光给该用户，将曝光过的物品排除掉。 但在判断找回物品是否曝光时，如果暴力对比时间复杂度很大，所以采用Bloom Filter。</p>
 <p>Bloom Filter 判断一个物品ID是否在已曝光的物品集合中，如果结果为no，那么该物品一定不在集合中，如果结果为yes，那么该物品<strong>可能</strong>在集合中。</p>
+<ol type="1">
+<li>Bloom Filter 把物品集合表征为一个 m 维的二进制向量</li>
+<li>每个用户有一个曝光物品的集合，表征为一个向量，需要 m bit的存储空间；</li>
+<li>Bloom filter 有 k 个哈希函数，每个哈希函数把物品ID映射成介于 0 和 m-1 之间的整数；</li>
+<li>如图所示，已曝光物品ID(<span class="math inline"><em>I</em><em>D</em><sub>1, 2, 3, 4, 5, 6</sub></span>)通过哈希函数映射进了二进制向量中对应的位置，如果该位置为0则调整为1，若为1无需调整；</li>
+<li>对于召回的物品ID，通过哈希函数映射，若对应位置为1，则说明该物品已曝光，否则未曝光。如<span class="math inline"><em>I</em><em>D</em><sub>8</sub></span>发生哈希碰撞，就会导致误判，但已曝光的一个也不会遗漏。 <img src="/img/Bloom%20Filter.png" srcset="/img/loading.gif" lazyload alt="Bloom Filter" /></li>
+</ol>
+<p>还有k=3的情况，此时只有三个位置都为1才认为是已曝光，这样误判概率会降低但依然存在。 <img src="/img/Bloom%20Filter.png" srcset="/img/loading.gif" lazyload alt="Bloom Filter" /></p>
+<p>如下图即为曝光过滤的过程，曝光物品会被记录下来，进行实时处理计算曝光物品的哈希值，把结果写入Bloom Filter的二进制向量，这个过程一定要快，不然用户刷新可能就会看到已看过的物品，小红书使用Kafka + Flink进行处理。召回结束后，召回服务器请求曝光过滤服务，曝光过滤服务将二进制向量发送给召回服务器，召回服务器利用Bloom Filter计算召回物品的哈希值与二进制向量进行对比，将已曝光的物品过滤掉。剩余未曝光物品发送给排序服务器。 <img src="/img/曝光过滤.png" srcset="/img/loading.gif" lazyload alt="曝光过滤" /></p>
+<p>Bloom Filter 还有一个缺点。在每次往集合内添加一个物品，只需要把向量对应的k个位置置为1。但删除一个物品时，无法直接将k个位置置为0，因为会影响其他物品的信息。所以，Bloom Filter 只支持添加物品，不支持删除物品。如果从集合中移除物品，则无法消除它对向量已经发生过的影响。但为了减少Bloom Filter的误判率，对于年龄大于一个月的物品，我们要移除掉（大于一个月的物品不会被召回，没必要记录在Bloom Filter中，使得二进制向量中1过多）。因为Bloom Filter不支持删除，所以我们只能每天重新计算一次二进制向量。很麻烦。</p>
 
                 
               </div>
@@ -617,6 +630,12 @@
                 <div class="post-prevnext my-3">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/Post4/" title="搜广推学习之路（四）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">搜广推学习之路（四）</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
